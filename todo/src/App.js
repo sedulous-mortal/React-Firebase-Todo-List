@@ -11,19 +11,22 @@ class App extends Component {
   }
 
   createTodo(todoText) {
-    //assign variable name to our url
-    const fbURL = 'https://todowithparis.firebaseio.com/.json';
-    // uses axios to make a post request to the Firebase db with the data
-      axios.post(fbURL, {
-          newText: todoText
-      }).then(() => {
-    //see if this promise gets executed
-    console.log("POSTED");
-  })//catch errors
-  .catch((error) => {
-    console.log(error);
-  });
-}  
+    let newTodo = { title: todoText, createdAt: new Date };
+    
+    axios({
+      url: '/todos.json',
+      baseURL: 'https://todowithparis.firebaseio.com/',
+      method: "POST",
+      data: newTodo
+    }).then((response) => {
+      let todos = this.state.todos;
+      let newTodoId = response.data.name;
+      todos[newTodoId] = newTodo;
+      this.setState({ todos: todos });
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
   
 
   handleNewTodoInput(event) {
@@ -48,11 +51,34 @@ class App extends Component {
         <div className="row pt-3">
           <div className="col-6 px-4">
             {this.renderNewTodoBox()}
+            {this.renderTodoList()}
           </div>
         </div>
       </div>
     );
   }
-}
+  
+  renderTodoList() {
+    let todoElements = [];
 
+    for(let todoId in this.state.todos) {
+      let todo = this.state.todos[todoId]
+
+      todoElements.push(
+        <div className="todo d-flex justify-content-between pb-4" key={todoId}>
+          <div className="mt-2">
+            <h4>{todo.title}</h4>
+            <div>{moment(todo.createdAt).calendar()}</div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="todo-list">
+        {todoElements}
+      </div>
+    );
+  }
+}
 export default App;
