@@ -6,13 +6,25 @@ class App extends Component {
   constructor() {
     super();
     this.state = { todos: {} };
-
+    
     this.handleNewTodoInput = this.handleNewTodoInput.bind(this);
   }
 
-  createTodo() {
-    // your code goes here
-  }
+  createTodo(todoText) {
+    //assign variable name to our url
+    const fbURL = 'https://todowithparis.firebaseio.com/.json';
+    // uses axios to make a post request to the Firebase db with the data
+      axios.post(fbURL, {
+          newText: todoText
+      }).then(() => {
+    //see if this promise gets executed
+    console.log("POSTED");
+  })//catch errors
+  .catch((error) => {
+    console.log(error);
+  });
+}  
+  
 
   handleNewTodoInput(event) {
     if (event.charCode === 13) {
